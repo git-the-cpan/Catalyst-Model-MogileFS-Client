@@ -1,0 +1,18 @@
+abstract: Model class of MogileFS::Client on Catalyst
+author: Toru Yamaguchi
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Catalyst-Model-MogileFS-Client
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Catalyst: 0
+  Catalyst::Exception: 0
+  Catalyst::Model: 0
+  File::Slurp: 0
+  MogileFS::Client: 0
+  Scalar::Util: 0
+version: 0.02
