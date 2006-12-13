@@ -1,5 +1,6 @@
 #!perl -T
 
+use lib qw(inc);
 use Test::Base;
 plan tests => 1;
 

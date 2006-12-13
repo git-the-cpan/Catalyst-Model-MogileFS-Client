@@ -1,6 +1,6 @@
 #!perl
 
-use lib qw(t/lib);
+use lib qw(inc t/lib);
 
 use Test::Base;
 use Catalyst::Model::MogileFS::Client;

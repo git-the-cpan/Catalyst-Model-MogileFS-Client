@@ -1,3 +1,4 @@
+
 package Catalyst::Model::MogileFS::Client;
 
 use strict;
@@ -14,36 +15,38 @@ use MogileFS::Client;
 __PACKAGE__->mk_accessors(qw/client/);
 
 {
-    no strict 'refs';
+		no strict 'refs';
 
-    my @delegate_methods = qw(
-      last_tracker
-      errstr
-      errcode
-      readonly
-      set_pref_ip
-      new_file
-      store_file
-      store_content
-      get_paths
-      get_file_data
-      delete
-      sleep
-      rename
-      list_keys
-      foreach_keys
-    );
+		my @delegate_methods = qw(
+																 last_tracker
+																 errstr
+																 errcode
+																 readonly
+																 set_pref_ip
+																 new_file
+																 store_file
+																 store_content
+																 get_paths
+																 get_file_data
+																 delete
+																 sleep
+																 rename
+																 list_keys
+																 foreach_keys
+												 );
 
-    foreach my $method (@delegate_methods) {
-        *{ "Catalyst::Model::MogileFS::Client::" . ${method} } = sub {
-            my ( $proto, @args ) = @_;
+		foreach my $method (@delegate_methods) {
+				*{"Catalyst::Model::MogileFS::Client::" . ${method}} = sub {
+						my ($proto, @args) = @_;
 
-            return eval { $proto->client->$method(@args); };
-            if ( my $error = $@ ) {
-                Catalyst::Exception->throw($error);
-            }
-        };
-    }
+						return eval {
+								$proto->client->$method(@args);
+						};
+						if (my $error = $@) {
+								Catalyst::Exception->throw($error);
+						}
+				};
+		}
 }
 
 =head1 NAME
@@ -52,11 +55,11 @@ Catalyst::Model::MogileFS::Client - Model class of MogileFS::Client on Catalyst
 
 =head1 VERSION
 
-Version 0.03
+Version 0.01
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.01';
 our $AUTOLOAD;
 
 =head1 SYNOPSIS
@@ -115,13 +118,12 @@ sub new {
 
     my $self = $class->NEXT::new($config);
 
-    eval {
-        $self->client(
-            MogileFS::Client->new( $class->_regulize_config($config) ) );
-    };
-    if ( my $error = $@ ) {
-        Catalyst::Exception->throw($error);
-    }
+		eval {
+				$self->client(MogileFS::Client->new($class->_regulize_config($config)));
+		};
+		if (my $error = $@) {
+				Catalyst::Exception->throw($error);
+		}
 
     return $self;
 }
@@ -136,11 +138,13 @@ More detail, see 'new' method.
 sub reload {
     my $self = shift;
 
-    return eval { $self->client->reload( $self->_regulize_config(@_) ); };
+		return eval {
+				$self->client->reload($self->_regulize_config(@_));
+		};
 
-    if ( my $error = $@ ) {
-        Catalyst::Exception->throw($error);
-    }
+		if (my $error = $@) {
+				Catalyst::Exception->throw($error);
+		}
 }
 
 =head2 client
@@ -340,19 +344,19 @@ See L<MogileFS::Client>, L<MogileFS::Backend>
 =cut
 
 sub AUTOLOAD {
-    my $self = shift;
+		my $self = shift;
 
-    my $method = $AUTOLOAD;
+		my $method = $AUTOLOAD;
     $method =~ s/^.*://;
 
-    return if ( $method eq 'DESTROY' );
+		return if ($method eq 'DESTROY');
 
-    return eval {
-        return $self->$method(@_)         if ( $self->can($method) );
-        return $self->client->$method(@_) if ( $self->can() );
-    };
+		return eval {
+				return $self->$method(@_) if ($self->can($method));
+				return $self->client->$method(@_) if ($self->can());
+		};
 
-    croak($@);
+		croak($@);
 }
 
 sub _regulize_config {

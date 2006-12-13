@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Base;
+use Test::More;
 
 plan tests => 3;
 

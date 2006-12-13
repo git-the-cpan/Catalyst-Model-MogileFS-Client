@@ -1,4 +1,4 @@
-use lib qw(t/lib);
+use lib qw(t/lib inc);
 use inc::Module::Install;
 use MY;
 
