@@ -2,6 +2,8 @@
 
 use strict;
 use warnings;
+
+use lib qw(inc t/lib);
 use Test::More;
 
 plan tests => 3;

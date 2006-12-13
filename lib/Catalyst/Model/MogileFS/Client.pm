@@ -11,6 +11,8 @@ use NEXT;
 use Scalar::Util qw/reftype/;
 use MogileFS::Client;
 
+use Data::Dump qw/dump/;
+
 __PACKAGE__->mk_accessors(qw/client/);
 
 {
@@ -52,11 +54,11 @@ Catalyst::Model::MogileFS::Client - Model class of MogileFS::Client on Catalyst
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our $AUTOLOAD;
 
 =head1 SYNOPSIS
@@ -111,13 +113,17 @@ timeout sec
 =cut
 
 sub new {
-    my ( $class, $config ) = @_;
+    my $class  = shift;
+    my $arguments = pop;
+    my $c      = shift;
 
-    my $self = $class->NEXT::new($config);
+		$class->config($arguments);
+
+    my $self = $class->NEXT::new( $c, $class->config );
 
     eval {
         $self->client(
-            MogileFS::Client->new( $class->_regulize_config($config) ) );
+            MogileFS::Client->new( $class->_regulize_config($class->config) ) );
     };
     if ( my $error = $@ ) {
         Catalyst::Exception->throw($error);
@@ -356,28 +362,42 @@ sub AUTOLOAD {
 }
 
 sub _regulize_config {
-    my ( $proto, @args ) = @_;
+    my $proto = shift;
+
+    my %params = ();
+
+    if ( reftype $_[0] eq 'HASH' ) {
+        %params = %{ $_[0] };
+    }
+    else {
+        %params = @_;
+    }
 
     my %options;
     $options{$_} = 1 foreach (qw/root domain backend readonly hosts timeout/);
 
-    my %params = ();
-
-    if ( reftype $args[0] eq 'HASH' ) {
-        %params = %{ $args[0] };
-    }
-    else {
-        %params = @args;
-    }
-
     return map { ( $_, $params{$_} ) }
-      grep { $options{$_} }
+      grep { exists $options{$_} }
       keys %params;
 }
 
 =head1 AUTHOR
 
 Toru Yamaguchi, C<< <zigorou at cpan.org> >>
+
+=head1 SEE ALSO
+
+=over 2
+
+=item L<MogileFS::Client>
+
+=item L<Catalyst::Model>
+
+=item L<Catalyst>
+
+=item L<NEXT>
+
+=back
 
 =head1 BUGS
 

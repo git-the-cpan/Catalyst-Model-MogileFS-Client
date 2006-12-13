@@ -2,8 +2,9 @@
 
 use lib qw(inc t/lib);
 
-use Test::Base;
+use Test::More;
 use Catalyst::Model::MogileFS::Client;
+
 use Test::Catalyst::Model::MogileFS::Client::Utils;
 
 plan tests => 4;
@@ -11,8 +12,6 @@ plan tests => 4;
 my $utils = Test::Catalyst::Model::MogileFS::Client::Utils->new;
 
 {
-		$utils->create_domain_unless_exists;
-
 		my $key = 'test.key';
 		my $to_key = 'test.alter.key';
 		my $content = 'foo bar baz';
@@ -31,6 +30,4 @@ my $utils = Test::Catalyst::Model::MogileFS::Client::Utils->new;
 
 		ok($mogile->delete($key), 'delete file');
 		ok($mogile->delete($to_key), 'delete file');
-
-		$utils->delete_domain;
 }

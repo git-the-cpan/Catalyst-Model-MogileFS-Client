@@ -1,5 +1,8 @@
 Revision history for Catalyst-Model-MogileFS-Client
 
+0.04    2006-12-14 03:31:08
+        Fixed using component config.
+
 0.03    2006-12-13 17:27:01
         Fixed manifest. tests.
 

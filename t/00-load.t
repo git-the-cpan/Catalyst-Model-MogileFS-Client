@@ -1,7 +1,7 @@
 #!perl -T
 
 use lib qw(inc);
-use Test::Base;
+use Test::More;
 plan tests => 1;
 
 use_ok( 'Catalyst::Model::MogileFS::Client' );

@@ -5,13 +5,16 @@ use warnings;
 
 use base qw/Class::Accessor::Fast/;
 
+use MogileFS::Client;
 use MogileFS::Admin;
 
 our $MOGILE_TEST_HOSTS = ($ENV{MOGILE_TEST_HOSTS}) ? [split(/\s+/, $ENV{MOGILE_TEST_HOSTS})] : ['127.0.0.1:7001'];
 our $MOGILE_TEST_DOMAIN = $ENV{MOGILE_TEST_DOMAIN} || "test.domain";
 our $MOGILE_TEST_CLASS = $ENV{MOGILE_TEST_CLASS} || "test.class";
 
-__PACKAGE__->mk_accessors(qw/admin hosts domain class/);
+__PACKAGE__->mk_accessors(qw/admin client hosts domain class/);
+
+use Data::Dump qw/dump/;
 
 sub new {
 		my ($class, $args) = @_;
@@ -22,18 +25,48 @@ sub new {
 		$args->{class} ||= $MOGILE_TEST_CLASS;
 
 		my $self = $class->SUPER::new($args);
+
 		$self->admin(MogileFS::Admin->new(hosts => $args->{hosts}));
+		$self->setup;
+		$self->client(MogileFS::Client->new(hosts => $args->{hosts}, domain => $args->{domain}));
 
 		return $self;
 }
 
-sub create_domain_unless_exists {
+sub setup {
+		my $self = shift;
+
+		$self->create_domain;
+		$self->create_class;
+}
+
+sub teardown {
+		my $self = shift;
+		my $keys = $self->client->list_keys("", "");
+		
+		foreach my $key (@$keys) {
+				$self->client->delete($key);
+		}
+
+		my $domains = $self->admin->get_domains;
+
+		foreach my $class (keys %{$domains->{$self->domain}}) {
+				$self->delete_class($self->domain, $class);
+		}
+
+		$self->delete_domain;
+}
+
+sub DESTROY {
+		shift->teardown(@_);
+}
+
+sub create_domain {
 		my ($self, $domain) = @_;
 		$domain ||= $self->domain;
 
 		unless ($self->is_exists_domain) {
 				$self->admin->create_domain($domain);
-				$self->admin->create_class($domain);
 		}
 }
 
