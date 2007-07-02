@@ -9,10 +9,17 @@ use Test::Catalyst::Model::MogileFS::Client::Utils;
 
 plan tests => 2;
 
-my $utils = Test::Catalyst::Model::MogileFS::Client::Utils->new;
+SKIP: {
+	my $utils;
 
-{
-		my $key = 'test.key';
+	eval {
+		$utils = Test::Catalyst::Model::MogileFS::Client::Utils->new;
+	};
+	if ($@) {
+		skip( "Maybe not running mogilefsd, " . $@, 2 );
+	}
+
+	my $key = 'test.key';
 		my $content = 'foo bar baz';
 
 		my $mogile = Catalyst::Model::MogileFS::Client->new({

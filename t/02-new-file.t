@@ -8,24 +8,30 @@ use Test::Catalyst::Model::MogileFS::Client::Utils;
 
 plan tests => 4;
 
-my $utils = Test::Catalyst::Model::MogileFS::Client::Utils->new;
+SKIP: {
+    my $utils;
 
-{
-		my $key = 'test.key';
-		my $content = 'Hello World';
+    eval { $utils = Test::Catalyst::Model::MogileFS::Client::Utils->new; };
+    if ($@) {
+        skip( "Maybe not running mogilefsd, " . $@, 4 );
+    }
 
-		my $mogile = Catalyst::Model::MogileFS::Client->new({
-				domain => $utils->domain,
-				hosts => $utils->hosts
-		});
+    my $key     = 'test.key';
+    my $content = 'Hello World';
 
-		my $fh = $mogile->new_file($key, $utils->class);
+    my $mogile = Catalyst::Model::MogileFS::Client->new(
+        {   domain => $utils->domain,
+            hosts  => $utils->hosts
+        }
+    );
 
-		ok($fh, 'get file handle');
-		ok(UNIVERSAL::isa($fh, 'IO::Handle'), 'isa IO::Handle');
-		print $fh $content;
-		$fh->close;
+    my $fh = $mogile->new_file( $key, $utils->class );
 
-		is(${$mogile->get_file_data($key)}, $content, 'compare file content');
-		ok($mogile->delete($key), 'delete file');
+    ok( $fh, 'get file handle' );
+    ok( UNIVERSAL::isa( $fh, 'IO::Handle' ), 'isa IO::Handle' );
+    print $fh $content;
+    $fh->close;
+
+    is( ${ $mogile->get_file_data($key) }, $content, 'compare file content' );
+    ok( $mogile->delete($key), 'delete file' );
 }

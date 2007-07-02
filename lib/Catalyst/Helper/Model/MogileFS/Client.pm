@@ -9,15 +9,15 @@ Catalyst::Helper::Model::MogileFS::Client - Helper for MogileFS Client models.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
-	script/myapp_create.pl model My::Model::Name MogileFS::Client [my.domain]
+script/myapp_create.pl model My::Model::Name MogileFS::Client [my.domain]
 
 =head1 DESCRIPTION
 
@@ -107,7 +107,7 @@ use warnings;
 use base qw/Catalyst::Model::MogileFS::Client/;
 
 __PACKAGE__->config([% IF domain %]
-	domain => '[% domain %]'
+  domain => '[% domain %]'
 [% END %]);
 
 =head1 NAME

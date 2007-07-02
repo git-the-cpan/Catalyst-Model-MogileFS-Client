@@ -17,6 +17,7 @@ requires('MogileFS::Client');
 requires('Scalar::Util');
 
 build_require('File::Slurp');
+build_require('Carp::Clan');
 
 use_test_base;
 

@@ -9,25 +9,31 @@ use Test::Catalyst::Model::MogileFS::Client::Utils;
 
 plan tests => 4;
 
-my $utils = Test::Catalyst::Model::MogileFS::Client::Utils->new;
+SKIP: {
+    my $utils;
 
-{
-		my $key = 'test.key';
-		my $to_key = 'test.alter.key';
-		my $content = 'foo bar baz';
+    eval { $utils = Test::Catalyst::Model::MogileFS::Client::Utils->new; };
+    if ($@) {
+        skip( "Maybe not running mogilefsd, " . $@, 4 );
+    }
 
-		my $mogile = Catalyst::Model::MogileFS::Client->new({
-				domain => $utils->domain,
-				hosts => $utils->hosts
-		});
+    my $key     = 'test.key';
+    my $to_key  = 'test.alter.key';
+    my $content = 'foo bar baz';
 
-		my $bytes = $mogile->store_content($key, $utils->class, $content);
+    my $mogile = Catalyst::Model::MogileFS::Client->new(
+        {   domain => $utils->domain,
+            hosts  => $utils->hosts
+        }
+    );
 
-		ok($mogile->rename($key, $to_key), 'rename');
+    my $bytes = $mogile->store_content( $key, $utils->class, $content );
 
-		$mogile->rename($key, $to_key);
-		is($mogile->errcode, 'unknown_key', 'errcode check');
+    ok( $mogile->rename( $key, $to_key ), 'rename' );
 
-		ok($mogile->delete($key), 'delete file');
-		ok($mogile->delete($to_key), 'delete file');
+    $mogile->rename( $key, $to_key );
+    is( $mogile->errcode, 'unknown_key', 'errcode check' );
+
+    ok( $mogile->delete($key),    'delete file' );
+    ok( $mogile->delete($to_key), 'delete file' );
 }

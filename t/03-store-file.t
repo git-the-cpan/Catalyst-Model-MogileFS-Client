@@ -10,19 +10,28 @@ use Test::Catalyst::Model::MogileFS::Client::Utils;
 
 plan tests => 3;
 
-my $utils = Test::Catalyst::Model::MogileFS::Client::Utils->new;
+SKIP: {
+    my $utils;
 
-{
-		my $key = 'test.key';
-		my $file = 'Makefile.PL';
+	eval {
+		$utils = Test::Catalyst::Model::MogileFS::Client::Utils->new;
+	};
+	if ($@) {
+		skip( "Maybe not running mogilefsd, " . $@, 3 );
+	}
 
-		my $mogile = Catalyst::Model::MogileFS::Client->new({
-				domain => $utils->domain,
-				hosts => $utils->hosts
-		});
+    my $key  = 'test.key';
+    my $file = 'Makefile.PL';
 
-		my $bytes = $mogile->store_file($key, $utils->class, $file);
-		is($bytes, -s $file, 'stored file size test');
-		is(${$mogile->get_file_data($key)}, slurp($file), 'compare file content');
-		ok($mogile->delete($key), 'delete file');
+    my $mogile = Catalyst::Model::MogileFS::Client->new(
+        {   domain => $utils->domain,
+            hosts  => $utils->hosts
+        }
+    );
+
+    my $bytes = $mogile->store_file( $key, $utils->class, $file );
+    is( $bytes, -s $file, 'stored file size test' );
+    is( ${ $mogile->get_file_data($key) },
+        slurp($file), 'compare file content' );
+    ok( $mogile->delete($key), 'delete file' );
 }

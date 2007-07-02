@@ -11,29 +11,27 @@ use NEXT;
 use Scalar::Util qw/reftype/;
 use MogileFS::Client;
 
-use Data::Dump qw/dump/;
-
 __PACKAGE__->mk_accessors(qw/client/);
 
 {
     no strict 'refs';
 
     my @delegate_methods = qw(
-      last_tracker
-      errstr
-      errcode
-      readonly
-      set_pref_ip
-      new_file
-      store_file
-      store_content
-      get_paths
-      get_file_data
-      delete
-      sleep
-      rename
-      list_keys
-      foreach_keys
+        last_tracker
+        errstr
+        errcode
+        readonly
+        set_pref_ip
+        new_file
+        store_file
+        store_content
+        get_paths
+        get_file_data
+        delete
+        sleep
+        rename
+        list_keys
+        foreach_keys
     );
 
     foreach my $method (@delegate_methods) {
@@ -54,25 +52,34 @@ Catalyst::Model::MogileFS::Client - Model class of MogileFS::Client on Catalyst
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 our $AUTOLOAD;
 
 =head1 SYNOPSIS
 
 in MyApp.pm
 
-	package MyApp;
+  package MyApp;
+    MyApp->config(
+      'Model::Storage::MyImage' => {
+        domain => 'myimage.art-code.org',
+        readonly => 1
+    }
+  );
 
-	MyApp->config(
-		'Model::Storage::MyImage' => {
-			domain => 'myimage.art-code.org',
-			readonly => 1
-		}
-	);
+=head1 INSTALL
+
+At first, you must run mogilefsd and mogstored.
+For example,
+
+  $ sudo mogstored 
+  $ sudo -u mogile mogilefsd
+
+Next, execute Makefile.PL.
 
 =head1 METHODS
 
@@ -113,17 +120,20 @@ timeout sec
 =cut
 
 sub new {
-    my $class  = shift;
+    my $class     = shift;
     my $arguments = pop;
-    my $c      = shift;
+    my $c         = shift;
 
-		$class->config($arguments);
+    $class->config($arguments);
 
     my $self = $class->NEXT::new( $c, $class->config );
 
     eval {
         $self->client(
-            MogileFS::Client->new( $class->_regulize_config($class->config) ) );
+            MogileFS::Client->new(
+                $class->_regulize_config( $class->config )
+            )
+        );
     };
     if ( my $error = $@ ) {
         Catalyst::Exception->throw($error);
@@ -377,8 +387,8 @@ sub _regulize_config {
     $options{$_} = 1 foreach (qw/root domain backend readonly hosts timeout/);
 
     return map { ( $_, $params{$_} ) }
-      grep { exists $options{$_} }
-      keys %params;
+        grep { exists $options{$_} }
+        keys %params;
 }
 
 =head1 AUTHOR
